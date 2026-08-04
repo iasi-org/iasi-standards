@@ -1,0 +1,22 @@
+# ADR-002 - Organización de los Architecture Decision Records
+
+- **Estado:** Aceptado
+- **Fecha:** 2026-08-04
+
+## Contexto
+
+El ecosistema IASI está formado por múltiples proyectos independientes.
+
+Algunas decisiones afectan únicamente a un proyecto concreto, mientras que otras establecen criterios comunes para todo el ecosistema.
+
+Es necesario definir dónde debe registrarse cada decisión para evitar duplicidades y facilitar su localización.
+
+## Decisión
+
+IASI distingue dos ámbitos para los Architecture Decision Records (ADR):
+
+### ADR de proyecto
+
+Documentan decisiones que afectan exclusivamente a un proyecto.
+
+Se almacenarán dentro del propio proyecto.

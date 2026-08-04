@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# ------------------------------------------------------------------------------
+# IASI - Ingeniería Asistida por Sistemas Inteligentes
+# ------------------------------------------------------------------------------
+#
+# Script.....: git-push.sh
+# Descripción: Añade todos los cambios al repositorio, crea un commit y realiza
+#              un push al remoto.
+#
+# Uso........: ./git-push.sh "Mensaje del commit"
+#
+# Parámetros.:
+#   $1..$n    Mensaje del commit.
+#
+# Requisitos.:
+#   - Git instalado.
+#   - Repositorio inicializado.
+#   - Rama con remoto configurado.
+#
+# Autor......: IASI Project
+# Licencia...: Apache License 2.0
+#
+# ------------------------------------------------------------------------------
+set -e
+
+if [ $# -eq 0 ]; then
+    echo "Uso:"
+    echo "  $0 \"mensaje del commit\""
+    exit 1
+fi
+
+MESSAGE="$*"
+
+echo "==> git add"
+git add -A
+
+echo "==> git commit"
+git commit -m "$MESSAGE"
+
+echo "==> git push"
+git push
+
+echo
+echo "✔ Push completado correctamente."

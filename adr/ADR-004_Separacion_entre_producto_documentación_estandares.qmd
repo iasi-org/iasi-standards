@@ -1,0 +1,86 @@
+# ADR-004 - Separación entre producto, documentación y estándares
+
+- **Estado:** Aceptado
+- **Fecha:** 2026-08-04
+
+## Contexto
+
+Inicialmente toda la documentación y los recursos asociados a un proyecto tendían a almacenarse junto al código fuente.
+
+Con el crecimiento del ecosistema IASI surgieron nuevos tipos de información:
+
+- documentación para usuarios;
+- documentación para desarrolladores;
+- historia del proyecto;
+- plantillas reutilizables;
+- estándares comunes;
+- recursos compartidos entre proyectos.
+
+Mantener todos estos elementos dentro del mismo repositorio dificulta su evolución independiente y mezcla responsabilidades.
+
+## Decisión
+
+IASI separará explícitamente los distintos tipos de conocimiento.
+
+```plantuml
+@startuml
+title Organización del conocimiento en IASI
+
+skinparam shadowing false
+skinparam linetype ortho
+
+package "Producto" {
+    [iasi-quarto]
+}
+
+package "Documentación" {
+    [iasi-quarto-docs]
+}
+
+package "Estándares" {
+    [iasi-standards]
+}
+
+iasi-quarto --> iasi-quarto-docs : se documenta en
+iasi-quarto-docs --> iasi-quarto : utiliza
+
+iasi-quarto --> iasi-standards : adopta estándares
+iasi-quarto-docs --> iasi-standards : adopta estándares
+
+@enduml
+```
+
+Cada responsabilidad evolucionará en un repositorio independiente.
+
+### Producto
+
+Contiene exclusivamente el software.
+
+### Documentación
+
+Contiene la documentación del producto.
+
+Puede incluir manuales de usuario, documentación para desarrolladores y el historial de decisiones del proyecto.
+
+### Estándares
+
+Contiene los elementos comunes reutilizables por todos los proyectos del ecosistema.
+
+Por ejemplo:
+
+- plantillas;
+- licencias;
+- convenciones;
+- ADR de ecosistema;
+- identidad visual.
+
+## Consecuencias
+
+- Cada repositorio tiene una responsabilidad claramente definida.
+- La documentación puede evolucionar independientemente del producto.
+- Los estándares dejan de duplicarse entre proyectos.
+- Los nuevos proyectos parten de una base común.
+
+## Justificación
+
+La separación por responsabilidades facilita la evolución independiente de cada componente del ecosistema y evita que un único repositorio concentre funciones heterogéneas.

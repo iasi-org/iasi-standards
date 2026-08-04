@@ -1,0 +1,86 @@
+# ADR-003 - Ciclo de vida de una decisión de ingeniería
+
+- **Estado:** Aceptado
+- **Fecha:** 2026-08-04
+
+## Contexto
+
+Las decisiones de ingeniería evolucionan con el tiempo.
+
+Inicialmente aparecen como respuesta a un problema concreto. Si demuestran ser útiles de forma reiterada, pueden convertirse en conocimiento reutilizable y, posteriormente, en componentes comunes del ecosistema.
+
+IASI considera que los estándares no deben diseñarse de forma anticipada, sino emerger a partir de la experiencia.
+
+## Decisión
+
+Las decisiones de ingeniería del ecosistema IASI seguirán el siguiente ciclo de vida:
+
+```
+@startuml
+title Evolución del conocimiento
+
+skinparam shadowing false
+skinparam linetype ortho
+
+package "Proyecto" {
+    rectangle "Problema"
+    rectangle "ADR"
+}
+
+package "Ecosistema" {
+    rectangle "Estándar"
+    rectangle "Plantilla"
+    rectangle "Automatización"
+}
+
+Problema --> ADR
+ADR --> Estándar
+Estándar --> Plantilla
+Plantilla --> Automatización
+
+note right of ADR
+La decisión queda registrada
+y justificada.
+end note
+
+note right of Estándar
+Solo cuando demuestra
+ser reutilizable.
+end note
+
+@enduml
+```
+
+### Problema
+
+Toda decisión nace de una necesidad real identificada durante el desarrollo de un proyecto.
+
+### ADR
+
+La decisión se documenta mediante un Architecture Decision Record (ADR), registrando el contexto, la decisión adoptada y sus consecuencias.
+
+### Estándar
+
+Cuando una decisión demuestra ser útil más allá del proyecto que la originó, pasa a formar parte de los estándares del ecosistema.
+
+### Plantilla
+
+Los estándares que pueden reutilizarse se materializan mediante plantillas, facilitando su aplicación en nuevos proyectos.
+
+### Automatización
+
+Cuando resulta beneficioso, las plantillas pueden ser aplicadas automáticamente mediante herramientas del ecosistema.
+
+## Consecuencias
+
+- Los estándares emergen a partir de problemas reales.
+- Se evita crear normas prematuras.
+- El conocimiento evoluciona de forma incremental.
+- La automatización es una consecuencia de la madurez del estándar y no un objetivo inicial.
+
+## Justificación
+
+Esta decisión refleja uno de los principios fundamentales de IASI:
+
+> No adoptamos metodologías para resolver problemas.
+> Partimos de los problemas para descubrir la metodología.

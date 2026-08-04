@@ -1,0 +1,37 @@
+# ADR-001 - Uso de Architecture Decision Records
+
+- **Estado:** Aceptado
+- **Fecha:** 2026-08-04
+
+## Contexto
+
+Las decisiones de ingeniería forman parte del conocimiento del proyecto.
+
+Si no se documentan, el contexto y la justificación de dichas decisiones se pierden con el tiempo, dificultando la evolución del software y la incorporación de nuevos colaboradores.
+
+IASI considera las decisiones de arquitectura como artefactos de ingeniería y, por tanto, deben documentarse y mantenerse junto al resto del proyecto.
+
+## Decisión
+
+Todos los proyectos del ecosistema IASI utilizarán **Architecture Decision Records (ADR)** para registrar las decisiones de ingeniería relevantes.
+
+Un ADR documenta:
+
+- el problema planteado;
+- el contexto en el que surge;
+- las alternativas consideradas, cuando proceda;
+- la decisión adoptada;
+- sus consecuencias.
+
+Los ADR forman parte de la documentación del proyecto y deberán mantenerse actualizados cuando una decisión evolucione o sea sustituida por otra.
+
+## Consecuencias
+
+- Las decisiones arquitectónicas dejan de depender únicamente del conocimiento de sus autores.
+- El razonamiento que conduce a una decisión permanece asociado al proyecto.
+- La evolución de la arquitectura puede comprenderse de forma cronológica.
+- Los ADR pasan a considerarse artefactos de ingeniería del ecosistema IASI.
+
+## Referencias
+
+- Michael Nygard. *Documenting Architecture Decisions*.
