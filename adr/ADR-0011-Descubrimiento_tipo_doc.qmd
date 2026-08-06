@@ -1,0 +1,96 @@
+# ADR-00XX - Descubrimiento del tipo de publicación
+
+## Estado
+
+Aceptado
+
+## Contexto
+
+Inicialmente `iasi.quarto` asumía que todas las publicaciones seguían la misma estructura.
+
+La evolución del framework ha introducido distintos modelos de organización, por lo que resulta necesario identificar automáticamente el tipo de publicación antes de iniciar el proceso de construcción.
+
+El objetivo es que el usuario no tenga que indicar mediante configuración qué tipo de publicación está construyendo.
+
+La propia estructura del proyecto debe describir el modelo utilizado.
+
+## Decisión
+
+El tipo de publicación se determina inspeccionando la estructura del proyecto.
+
+Se definen dos modelos principales de publicación.
+
+### Libro estructurado (*Structured Book*)
+
+Una carpeta que contiene un archivo:
+
+```text
+index.qmd
+```
+
+representa una parte del libro.
+
+El archivo `index.qmd` pertenece al autor y forma parte de la publicación.
+
+El framework no modifica su contenido.
+
+### Libro (*Book*)
+
+Una carpeta que contiene un archivo:
+
+```text
+00-index.qmd
+```
+
+representa un capítulo.
+
+El archivo `00-index.qmd` contiene el título del capítulo y, opcionalmente, una introducción.
+
+Durante el proceso de construcción, `iasi.quarto` genera automáticamente un archivo:
+
+```text
+index.qmd
+```
+
+que incluye mediante directivas `include` todos los documentos de la carpeta.
+
+Los documentos restantes deberán comenzar en un nivel de encabezado dos (`##`) o inferior.
+
+### Procesamiento explícito
+
+Si una carpeta contiene un archivo:
+
+```text
+index.txt
+```
+
+el framework la procesa exactamente tal y como indique su contenido.
+
+`index.txt` actúa como un marcador (*marker file*) y no forma parte de la publicación.
+
+Su única finalidad es indicar explícitamente al constructor cómo debe tratar esa carpeta.
+
+Las carpetas marcadas con `index.txt` no participan en la detección automática del tipo de publicación.
+
+## Validación
+
+Una misma publicación no puede mezclar carpetas identificadas mediante:
+
+- `index.qmd`
+- `00-index.qmd`
+
+La presencia simultánea de ambos modelos indica una estructura inconsistente y provoca un error de validación.
+
+Las carpetas marcadas con `index.txt` quedan excluidas de esta comprobación, ya que representan una decisión explícita del autor.
+
+## Consecuencias
+
+Esta decisión permite:
+
+- eliminar configuración innecesaria;
+- deducir automáticamente el tipo de publicación;
+- simplificar el proceso de construcción;
+- realizar validaciones deterministas antes del renderizado;
+- mantener la estructura del proyecto como fuente única de información.
+
+El framework pasa a interpretar la estructura del proyecto en lugar de depender de parámetros de configuración externos.

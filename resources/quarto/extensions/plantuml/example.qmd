@@ -1,0 +1,22 @@
+---
+title: "Prueba PlantUML5 con estilos"
+format: html
+filters:
+  - plantuml5.lua
+
+engines:
+  plantuml:
+    enabled: true
+    server: http://javier:1025
+    format: svg
+    cache: clean
+    styles:
+      - ../../../plantuml/iasi.puml
+---
+
+```{.plantuml label="fig-test" fig-cap="PlantUML5 con estilo IASI" width="70%"}
+@startuml
+Alice -> Bob : Hola
+Bob --> Alice : Estilo aplicado
+@enduml
+```

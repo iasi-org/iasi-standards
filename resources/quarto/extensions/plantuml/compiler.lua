@@ -1,0 +1,158 @@
+local Compiler = {}
+
+local OUTPUT_FORMAT = "png"
+
+local SUPPORTED_FORMATS = {
+  png = "image/png",
+  svg = "image/svg+xml"
+}
+
+local function trim_trailing_slash(value)
+  return (value:gsub("/+$", ""))
+end
+
+local function hex_encode(value)
+  return (value:gsub(".", function(character)
+    return string.format("%02x", string.byte(character))
+  end))
+end
+
+local function normalize_styles(styles)
+  if styles == nil then
+    return {}
+  end
+
+  if type(styles) == "table" then
+    return styles
+  end
+
+  return { tostring(styles) }
+end
+
+local function read_file(path)
+  local file, message = io.open(path, "rb")
+
+  if file == nil then
+    error(
+      "No se pudo leer el estilo PlantUML "
+        .. tostring(path)
+        .. ": "
+        .. tostring(message)
+    )
+  end
+
+  local contents = file:read("*a")
+  file:close()
+
+  return contents
+end
+
+local function inject_after_startuml(source, styles_source)
+  if styles_source == "" then
+    return source
+  end
+
+  local _, end_position = source:find("@startuml[^\r\n]*")
+
+  if end_position == nil then
+    return styles_source .. "\n" .. source
+  end
+
+  return source:sub(1, end_position)
+    .. "\n"
+    .. styles_source
+    .. "\n"
+    .. source:sub(end_position + 1)
+end
+
+local function validate_format(format)
+  format = tostring(format):lower()
+
+  if SUPPORTED_FORMATS[format] == nil then
+    local supported = {}
+
+    for name, _ in pairs(SUPPORTED_FORMATS) do
+      table.insert(supported, name)
+    end
+
+    table.sort(supported)
+
+    error(
+      "Formato PlantUML no soportado: "
+        .. format
+        .. ". Formatos soportados: "
+        .. table.concat(supported, ", ")
+        .. "."
+    )
+  end
+
+  return format
+end
+
+function Compiler.prepare(source, config)
+
+  config.format = OUTPUT_FORMAT
+  
+  local style_files = normalize_styles(config.styles)
+
+  if #style_files == 0 then
+    return source
+  end
+
+  local fragments = {}
+
+  for _, style_file in ipairs(style_files) do
+    table.insert(fragments, read_file(tostring(style_file)))
+  end
+
+  return inject_after_startuml(
+    source,
+    table.concat(fragments, "\n")
+  )
+end
+
+function Compiler.mime_type(config)
+  local format = validate_format(config.format)
+
+  return SUPPORTED_FORMATS[format]
+end
+
+function Compiler.compile(source, config)
+  local format = validate_format(config.format)
+
+  local url = trim_trailing_slash(tostring(config.server))
+    .. "/"
+    .. format
+    .. "/~h"
+    .. hex_encode(source)
+
+  local ok, mime_type, contents = pcall(
+    pandoc.mediabag.fetch,
+    url
+  )
+
+  if not ok then
+    error(
+      "No se pudo obtener el diagrama PlantUML.\n"
+        .. "URL: "
+        .. url
+        .. "\nDetalle: "
+        .. tostring(mime_type)
+    )
+  end
+
+  if contents == nil or contents == "" then
+    error(
+      "PlantUML devolvio una respuesta vacia: "
+        .. url
+    )
+  end
+
+  if mime_type == nil or mime_type == "" then
+    mime_type = SUPPORTED_FORMATS[format]
+  end
+
+  return mime_type, contents
+end
+
+return Compiler

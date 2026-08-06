@@ -1,0 +1,53 @@
+# Reserved Prefix `00-`
+
+## Status
+
+Accepted
+
+## Context
+
+A common convention is required across all IASI projects to clearly separate infrastructure artifacts from domain artifacts.
+
+Many repositories contain auxiliary resources, templates, scripts, configuration files or generated artifacts that should not be considered part of the functional content.
+
+Without a common convention, every repository ends up inventing its own structure.
+
+## Decision
+
+The numeric prefix `00-` is reserved for infrastructure.
+
+Any file or directory beginning with `00-` has a special meaning for the framework or for the project structure.
+
+It is not considered part of the functional or editorial sequence.
+
+Examples:
+
+```
+00-common/
+00-shared/
+00-assets/
+00-template.md
+00-index.qmd
+```
+
+User artifacts should start at `01-`.
+
+Examples:
+
+```
+01-introduction/
+02-installation/
+03-api/
+```
+
+## Consequences
+
+This convention provides:
+
+- predictable project structures;
+- simpler discovery algorithms;
+- separation between infrastructure and user content;
+- consistent ordering across repositories;
+- extensibility without additional configuration.
+
+The convention applies to all IASI repositories unless a project explicitly documents a different rule.
