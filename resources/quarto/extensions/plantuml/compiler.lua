@@ -11,12 +11,6 @@ local function trim_trailing_slash(value)
   return (value:gsub("/+$", ""))
 end
 
-local function hex_encode(value)
-  return (value:gsub(".", function(character)
-    return string.format("%02x", string.byte(character))
-  end))
-end
-
 local function normalize_styles(styles)
   if styles == nil then
     return {}
@@ -89,10 +83,31 @@ local function validate_format(format)
   return format
 end
 
-function Compiler.prepare(source, config)
+local function pipe_error_detail(problem)
+  if type(problem) ~= "table" then
+    return tostring(problem)
+  end
 
+  local parts = {}
+
+  if problem.error_code ~= nil then
+    table.insert(parts, "codigo: " .. tostring(problem.error_code))
+  end
+
+  if problem.output ~= nil and problem.output ~= "" then
+    table.insert(parts, tostring(problem.output))
+  end
+
+  if #parts == 0 then
+    return tostring(problem)
+  end
+
+  return table.concat(parts, "\n")
+end
+
+function Compiler.prepare(source, config)
   config.format = OUTPUT_FORMAT
-  
+
   local style_files = normalize_styles(config.styles)
 
   if #style_files == 0 then
@@ -119,40 +134,47 @@ end
 
 function Compiler.compile(source, config)
   local format = validate_format(config.format)
-
   local url = trim_trailing_slash(tostring(config.server))
     .. "/"
     .. format
-    .. "/~h"
-    .. hex_encode(source)
 
-  local ok, mime_type, contents = pcall(
-    pandoc.mediabag.fetch,
-    url
+  local ok, contents = pcall(
+    pandoc.pipe,
+    "curl",
+    {
+      "--fail",
+      "--silent",
+      "--show-error",
+      "--location",
+      "--request",
+      "POST",
+      "--header",
+      "Content-Type: text/plain; charset=utf-8",
+      "--data-binary",
+      "@-",
+      url
+    },
+    source
   )
 
   if not ok then
     error(
-      "No se pudo obtener el diagrama PlantUML.\n"
+      "No se pudo obtener el diagrama PlantUML mediante POST.\n"
         .. "URL: "
         .. url
         .. "\nDetalle: "
-        .. tostring(mime_type)
+        .. pipe_error_detail(contents)
     )
   end
 
   if contents == nil or contents == "" then
     error(
-      "PlantUML devolvio una respuesta vacia: "
+      "PlantUML devolvio una respuesta vacia mediante POST: "
         .. url
     )
   end
 
-  if mime_type == nil or mime_type == "" then
-    mime_type = SUPPORTED_FORMATS[format]
-  end
-
-  return mime_type, contents
+  return SUPPORTED_FORMATS[format], contents
 end
 
 return Compiler
